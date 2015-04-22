@@ -279,20 +279,75 @@ actions: {
 
 ## Marking a Model as Complete or Incomplete
 
-tk
+Next up, we will add the ability to mark a todo as complete or incomplete and persist the update.
+
+First, update `app/templates/todos.hbs` by adding an `itemController` to the `{{each}}` helper. Also, convert the static `<input>` element to an `{{input}}` helper.
+
+```html
+{{#each todo in model itemController="todo"}}
+	<li {{bind-attr class="todo.model.isCompleted:completed"}}>
+		{{input type="checkbox" checked=todo.model.isCompleted class="toggle"}}
+		<label >{{todo.model.title}}</label><button class="destroy"></button>
+	</li>
+{{/each}}
+```
+
+Notice that `todo.isCompleted` has been changed to `todo.model.isCompleted`. This is a result of the way the new todo controller is structured. Ember recently depricated the `ObjectController` class in favor of the easier to remember `Controller` class, which is part of the reason for this change.
+
+A new controller needs to be created for working with the individual todos. Use the generator to create the controller.
 
 ```sh
 ember g controller todo
 ```
 
-Populate todo.js with following
+In the `extend` block of `app/controllers/todo.js` add this code.
+
 ```javascript
-tk
+isCompleted: function(key, value) {
+	var model = this.get('model');
+
+	if (value === undefined) {
+		return model.get('isCompleted');
+	} else {
+		model.set('isCompleted', value);
+		model.save();
+		return value;
+	}
+}.property('model.isCompleted')
 ```
+
+The `isCompleted` property of the controller is a computed property whose value is dependent on the value of the model instance's `isCompleted` property.
+
+When called with a value, because the user clicked the checkbox, the controller will toggle the model instance's `isCompleted` property and persist the change.  When called without a value, such as on the page load, it will simply return the value of the model instance's `isCompleted` property.
 
 ## Displaying the Number of Incomplete Todos
 
-tk
+Update `app/templates/todos.hbs` as shown below.
+
+```html
+<span class="todo-count">
+	<strong>{{remaining}}</strong> {{inflection}} left
+</span>
+```
+
+Implement the `remaining` and `inflection` properties in `app/controllers/todos.js`.
+
+```javascript
+actions: {
+	// ...
+},
+remaining: function() {
+	return this.filterBy('isCompleted', false).get('length');
+}.property('@each.isCompleted'),
+inflection: function() {
+	var remaining = this.get('remaining');
+	return remaining === 1 ? 'item' : 'items';
+}.property('remaining')
+```
+
+The `remaining` property returns the number of todos whose `isCompleted` property is false. Any time the `isCompleted` property of a todo changes, the `remaining` property will recalculate.
+
+The `inflection` property watches the `remaining` property and will update whenever `remaining` updates. If `remaining` is 1 the singular will be returned, otherwise the plural will be returned.
 
 ## Toggling between Showing and Editing States
 
