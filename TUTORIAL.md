@@ -226,7 +226,7 @@ Now `app/templates/todos.hbs` can be modified to replace the static `<li>` eleme
 
 Because no custom behavior is required from the controller at this point, we can rely on the default controller provided by the framework.
 
-## Displaying a Model's Complete State
+## Displaying a model's complete state
 
 TodoMVC uses the `completed` class to apply a strikethrough to completed todos. Modify the `<li>` element in `app/templates/todos.hbs` to apply the class when a todo's `isCompleted` property is true.
 
@@ -234,7 +234,7 @@ TodoMVC uses the `completed` class to apply a strikethrough to completed todos. 
 <li {{bind-attr class="todo.isCompleted:completed"}}>
 ```
 
-## Creating a New Model Instance
+## Creating a new model instance
 
 Now that we can display the data, we can make some changes so we can add items to the todo list.
 
@@ -277,7 +277,7 @@ actions: {
 
 `createTodo` gets the `newTitle` property and creates a new todo record using the input as the title and setting `isCompleted` to false. It then clears the input and saves the record to the store.
 
-## Marking a Model as Complete or Incomplete
+## Marking a model as complete or incomplete
 
 Next up, we will add the ability to mark a todo as complete or incomplete and persist the update.
 
@@ -320,7 +320,7 @@ The `isCompleted` property of the controller is a computed property whose value 
 
 When called with a value, because the user clicked the checkbox, the controller will toggle the model instance's `isCompleted` property and persist the change.  When called without a value, such as on the page load, it will simply return the value of the model instance's `isCompleted` property.
 
-## Displaying the Number of Incomplete Todos
+## Displaying the number of incomplete todos
 
 Update `app/templates/todos.hbs` as shown below.
 
@@ -349,66 +349,71 @@ The `remaining` property returns the number of todos whose `isCompleted` propert
 
 The `inflection` property watches the `remaining` property and will update whenever `remaining` updates. If `remaining` is 1 the singular will be returned, otherwise the plural will be returned.
 
-## Toggling between Showing and Editing States
+## Toggling between showing and editing states
 
 tk
 
-## Accepting Edits
+## Accepting edits
 
 ```sh
 ember g component edit-todo
 ```
 
-## Deleting a Model
+## Deleting a model
 
 tk
 
-## Adding Child Routes
+## Adding child routes
 
 ```sh
 ember g route todos/index
 ```
 
-## Transitioning to Show Only Incomplete Todos
+## Transitioning to show only incomplete todos
 
 ```sh
 ember g route todos/active
 ```
 
-## Transitioning to Show Only Completed Todos
+## Transitioning to show only completed todos
 
 ```sh
 ember g route todos/completed
 ```
 
-## Transitioning Back to Show All Todos
+## Transitioning back to show all todos
 
 tk
 
-## Displaying a Button to Remove All Completed Todos
+## Displaying a button to remove all completed todos
 
 tk
 
-## Indicating When All Todos Are Complete
+## Indicating when all todos are complete
 
 tk
 
-## Toggling All Todos Between Complete and Incomplete
+## Toggling all todos between complete and incomplete
 
 tk
 
 ## Replacing HTTP-Mock with localStorage
+
+Adapters are easily swapped without affecting the overall application. Now that the application is complete, we will add a localStorage adapter, so the information can be persisted outside the session without a server.
+
+Install the localStorage adapter and create a serializer to manage stringifying the JSON data for storage.
 
 ```sh
 ember install:bower ember-localstorage-adapter
 ember g serializer application
 ```
 
-Go to Brocfile.js and add the following below the CSS imports
+Go to Brocfile.js and add the following below the CSS imports which will include the adapter logic as a dependency.
 
 ```javascript
 app.import('bower_components/ember-localstorage-adapter/localstorage_adapter.js');
 ```
+Now we need to make the application aware that we are using localStorage rather than REST.
 
 Open `app/serializers/application.js` and change `RESTSerializer` to `LSSerializer`.
 
