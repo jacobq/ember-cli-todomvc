@@ -15,10 +15,13 @@ export default Ember.ObjectController.extend({
       }
     },
     removeTodo: function() {
-      var todo = this.get('model');
-      todo.deleteRecord();
-      todo.save();
+      this.removeTodo();
     }
+  },
+  removeTodo: function () {
+    var todo = this.get('model');
+    todo.deleteRecord();
+    todo.save();
   },
   isEditing: false,
   isCompleted: function(key, value) {
