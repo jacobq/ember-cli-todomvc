@@ -197,13 +197,34 @@ export default DS.RESTAdapter.extend({
 
 By default, http-mock serves the data from /api/todos, which necessitates the namespace.
 
-## Displaying Model Data
+## Displaying model data
+
+Now that data is available to the application, the code will be modified to display the dynamic data rather than the static mockup.
+
+To serve the data to the template, we first need to modify `app/routes/todos.js` so it knows what data to pull. Add the following inside the `extend` block.
 
 ```javascript
 model: function() {
 	return this.store.find('todo');
 }
 ```
+
+Now `app/templates/todos.hbs` can be modified to replace the static `<li>` elements with the Handlebars {{each}} helper.
+
+```html
+//...
+<ul class="todo-list">
+	{{#each todo in model}}
+		<li>
+			<input type="checkbox" class="toggle">
+			<label>{{todo.title}}</label><button class="destroy"></button>
+		</li>
+	{{/each}}
+</ul>
+//...
+```
+
+Because no custom behavior is required from the controller at this point, we can rely on the default controller provided by the framework.
 
 ## Displaying a Model's Complete State
 
