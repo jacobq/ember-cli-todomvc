@@ -5,9 +5,12 @@ Navigate to the folder that you want to create your project in and execute the f
 ```sh
 ember new ember-cli-todomvc
 cd ember-cli-todomvc
+ember serve
 ```
 
 This will scaffold out the application structure and give you a starting point to build on. All bash commands going forward are in the application directory. When files are referenced throughout this tutorial, they will be provided with the path assuming that the application directory is the base.
+
+`ember serve` instantates a server that you can access at `localhost:4200` and will watch for changes in the application directory.
 
 ## Install TodoMVC base
 
@@ -116,15 +119,29 @@ The generator will create three files:
 
 The generator also modifies `app/router.js` to reflect the new route/resource.
 
-Copy all HTML between <body> and </body> to todos.hbs. Replace copied HTML in application.hbs with {{outlet}}.
+Copy all HTML between `<body>` and `</body>` to `app/templates/todos.hbs`. Replace copied HTML in `app/templates/application.hbs` with {{outlet}}.
+
+```html
+//...
+<body>
+	{{outlet}}
+</body>
+//...
+```
 
 ## Modeling data
+
+Use the model generator to create a new `todo` model.
 
 ```sh
 ember generate model todo
 ```
 
-Modify models/todo.js to the following
+This will create two new files:
+* `/app/models/todo.js`
+* `tests/unit/models/todo-test.js`
+
+Modify `app/models/todo.js` to the following
 ```javascript
 export default DS.Model.extend({
 	title: DS.attr('string'),
@@ -134,11 +151,15 @@ export default DS.Model.extend({
 
 ## Create mock for fixture data
 
+Previous versions of Ember used fixtures for mock data. While fixtures are still available, it is now recommended that you use http-mock which creates a simple Express.js server that will run when you use `ember serve`.
+
+http-mock is very simple to setup and use. The generator does most of the work for you.
+
 ```sh
 ember g http-mock todos
 ```
 
-Add the following between the `[]` in server/mocks/todos.js.
+Add the mock data in JSON format between the `[]` in `server/mocks/todos.js`.
 
 ```javascript
 {
@@ -158,7 +179,13 @@ Add the following between the `[]` in server/mocks/todos.js.
 }
 ```
 
-Create a file called `application.js` in the adapters folder and populate with the following code:
+Use the generator to create a new adapter.
+
+```sh
+ember g adapter application
+```
+
+The adapter will be created at `app/adapters/application.js`. Open this file and modify it to read as follows.
 
 ```
 import DS from 'ember-data';
@@ -167,6 +194,8 @@ export default DS.RESTAdapter.extend({
 	namespace: 'api'
 });
 ```
+
+By default, http-mock serves the data from /api/todos, which necessitates the namespace.
 
 ## Displaying Model Data
 
