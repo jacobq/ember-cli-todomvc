@@ -11,7 +11,7 @@ This will scaffold out the application structure and give you a starting point t
 
 ## Install TodoMVC base
 
-The fine folks at TodoMVC provide the CSS for the application, so we don't have to build it from scratch.
+The fine folks at [TodoMVC] provide the CSS for the application, so we don't have to build it from scratch.
 
 ```sh
 ember install:bower todomvc-app-css
@@ -25,11 +25,96 @@ app.import('bower_components/todomvc-common/base.css');
 app.import('bower_components/todomvc-app-css/index.css');
 ```
 
+## Create a static mockup of the app
+
+Before adding any code, create a static mockup of the app to `app/templates/application.hbs`. There is no need to add links to the CSS files, as that will be handled by Ember's built-in dependency management.
+
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Ember.js • TodoMVC</title>
+  </head>
+  <body>
+    <section class="todoapp">
+      <header class="header">
+        <h1>todos</h1>
+        <input type="text" class="new-todo" placeholder="What needs to be done?" />
+      </header>
+
+      <section class="main">
+        <ul class="todo-list">
+          <li class="completed">
+            <input type="checkbox" class="toggle">
+            <label>Learn Ember.js</label><button class="destroy"></button>
+          </li>
+          <li>
+            <input type="checkbox" class="toggle">
+            <label>...</label><button class="destroy"></button>
+          </li>
+          <li>
+            <input type="checkbox" class="toggle">
+            <label>Profit!</label><button class="destroy"></button>
+          </li>
+        </ul>
+
+        <input type="checkbox" class="toggle-all">
+      </section>
+
+      <footer class="footer">
+        <span class="todo-count">
+          <strong>2</strong> todos left
+        </span>
+        <ul class="filters">
+          <li>
+            <a href="all" class="selected">All</a>
+          </li>
+          <li>
+            <a href="active">Active</a>
+          </li>
+          <li>
+            <a href="completed">Completed</a>
+          </li>
+        </ul>
+
+        <button class="clear-completed">
+          Clear completed (1)
+        </button>
+      </footer>
+    </section>
+
+    <footer class="info">
+      <p>Double-click to edit a todo</p>
+    </footer>
+  </body>
+</html>
+```
+
+This will be modified throughout the tutorial as features are implemented.
+
 ## Adding first route and template
+
+ember-cli utilizes generators similar to Rails. Generators are called using `ember generate` or `ember g` for short. This tutorial will use the short form.
+
+The `route` generator has two options:
+* `type` can be either `route` or `resource`
+* `path` which specifies a path other than what can be directly inferred using the route name
+
+A `resource` does not change the URI, whereas a `route` does.
+
+Use the route generator to create a resource at the URI root.
 
 ```sh
 ember g route todos --type=resource --path '/'
 ```
+
+The generator will create three files:
+* `app/routes/todos.js`
+* `app/templates/todos.hbs`
+* `tests/unit/routes/todos-test.js`
+
+The generator also modifies `app/router.js` to reflect the new route/resource.
 
 Copy all HTML between <body> and </body> to todos.hbs. Replace copied HTML in application.hbs with {{outlet}}.
 
@@ -53,7 +138,7 @@ export default DS.Model.extend({
 ember g http-mock todos
 ```
 
-Add the following between the `[]` in server/mocks/todos.js. 
+Add the following between the `[]` in server/mocks/todos.js.
 
 ```javascript
 {
@@ -197,3 +282,5 @@ app.import('bower_components/ember-localstorage-adapter/localstorage_adapter.js'
 Open `app/serializers/application.js` and change `RESTSerializer` to `LSSerializer`.
 
 Open `app/adapters/application.js` and change `RESTAdapter` to `LSAdapter`.
+
+[TodoMVC]: http://www.todomvc.com
