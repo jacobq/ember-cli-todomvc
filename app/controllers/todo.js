@@ -9,7 +9,7 @@ export default Ember.Controller.extend({
       this.model.set('isEditing', false);
 
       if (Ember.isEmpty(this.model.get('title'))) {
-        this.send('removeTodo')
+        this.send('removeTodo');
       } else {
         this.get('model').save();
       }
@@ -24,7 +24,7 @@ export default Ember.Controller.extend({
   isCompleted: function(key, value) {
     var model = this.get('model');
 
-    if (value == undefined) {
+    if (value === undefined) {
       return model.get('isCompleted');
     } else {
       model.set('isCompleted', value);

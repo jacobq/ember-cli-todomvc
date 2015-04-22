@@ -19,5 +19,6 @@ var app = new EmberApp();
 
 app.import('bower_components/todomvc-common/base.css');
 app.import('bower_components/todomvc-app-css/index.css');
+app.import('bower_components/ember-localstorage-adapter/localstorage_adapter.js');
 
 module.exports = app.toTree();
