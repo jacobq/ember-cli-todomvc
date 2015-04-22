@@ -351,22 +351,144 @@ The `inflection` property watches the `remaining` property and will update whene
 
 ## Toggling between showing and editing states
 
-tk
+TodoMVC allows users to double-click on a todo to edit the title. To implement this functionality we will add an `isEditing` property to the todo controller which will be used to class the `<li>` element and provide an input for editing the todo.
+
+Update `app/templates/todos.hbs` as follows.
+
+```html
+<ul class="todo-list">
+  {{#each todo in model itemController="todo"}}
+    <li {{bind-attr class="todo.model.isCompleted:completed todo.model.isEditing:editing"}}>
+      {{#if todo.model.isEditing}}
+        <input class="edit">
+      {{else}}
+        {{input type="checkbox" checked=todo.model.isCompleted class="toggle"}}
+        <label {{action "editTodo" on="doubleClick"}}>{{todo.model.title}}</label><button class="destroy"></button>
+      {{/if}}
+    </li>
+  {{/each}}
+</ul>
+```
+
+In `app/controllers/todo.js` add an `editTodo` action and an `isEditing` property.
+
+```javascript
+actions: {
+  editTodo: function() {
+    this.set('isEditing', true);
+  },
+  isEditing: false,
+  //...
+}
+```
+
+This provides the `editTodo` method which switches the `isEditing` property to true. Now when you double-click on a todo, you are provided a blank input. Not quite what we are looking for.
 
 ## Accepting edits
+
+Now that we have an input, we need to make it functional. Now we will add the logic to focus on the input when it is visible, accept user input, and persist changes when the user presses `Enter`.
+
+Generate a component which will be a modified implementation of a text field.
 
 ```sh
 ember g component edit-todo
 ```
 
+Modify the newly generated `app/components/edit-todo.js` to match the following.
+
+```javascript
+//...
+export default Ember.TextField.extend({
+  didInsertElement: function() {
+    this.$().focus();
+  }
+});
+```
+
+This automatically focuses on the element when it is inserted into the page.
+
+Next, replace the static `input` element with the `{{edit-todo}}` component in `app/templates/todos.hbs`.
+
+```html
+{{#if todo.model.isEditing}}
+  {{edit-todo class="edit" value=todo.model.title focus-out="acceptChanges" insert-newline="acceptChanges"}}
+{{else}}
+```
+
+The method `acceptChanges` will be called if the user presses `Enter` or otherwise takes focus away from the input. The `value` of the input is bound to the `title` property of the model instance.
+
+Finally, the `acceptChanges` method needs to be added to `app/controllers/todo.js`.
+
+```javascript
+//...
+editTodo: function() {
+  this.model.set('isEditing', true);
+},
+acceptChanges: function() {
+  this.model.set('isEditing', false);
+
+  if (Ember.isEmpty(this.model.get('title'))) {
+    this.send('removeTodo');
+  } else {
+    this.get('model').save();
+  }
+}
+//...
+```
+
 ## Deleting a model
 
-tk
+Update the static `<button>` element in `app/templates/todos.hbs` to use an action called `removeTodo`.
+
+```html
+<button {{action "removeTodo"}} class="destroy"></button>
+```
+
+Add the `removeTodo` method to `app/controllers/todo.js`
+
+```javascript
+//...
+acceptChanges: function() {
+  this.model.set('isEditing', false);
+
+  if (Ember.isEmpty(this.model.get('title'))) {
+    this.send('removeTodo');
+  } else {
+    this.get('model').save();
+  }
+},
+removeTodo: function() {
+  var todo = this.get('model');
+  todo.deleteRecord();
+  todo.save();
+}
+//...
+```
 
 ## Adding child routes
 
+Adding child routes to the `todos` resource in the router will allow implementation of the filtered **Active** and **Completed** views that are linked at the bottom of the list.  Use the generator to create a new `index` route within the `todos` resource.
+
 ```sh
 ember g route todos/index
+```
+
+In addition to the route, the generator also gives us `app/templates/todos/index.hbs`. Move the entire todo list `<ul>` block to this file and replace it with `{{outlet}}` in `app/templates/todos.hbs`.
+
+```html
+<section class="main">
+  {{outlet}}
+
+  <input type="checkbox" class="toggle-all">
+</section>
+```
+
+Add the following to the `extend` block in `app/routes/todos/index.js`.
+
+```javascript
+model: function() {
+  return this.modelFor('todos');
+}
 ```
 
 ## Transitioning to show only incomplete todos
