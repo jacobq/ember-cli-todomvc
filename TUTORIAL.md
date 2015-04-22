@@ -228,28 +228,54 @@ Because no custom behavior is required from the controller at this point, we can
 
 ## Displaying a Model's Complete State
 
-tk
+TodoMVC uses the `completed` class to apply a strikethrough to completed todos. Modify the `<li>` element in `app/templates/todos.hbs` to apply the class when a todo's `isCompleted` property is true.
+
+```html
+<li {{bind-attr class="todo.isCompleted:completed"}}>
+```
 
 ## Creating a New Model Instance
 
-Replace the input with an `{{input}}` helper.
+Now that we can display the data, we can make some changes so we can add items to the todo list.
 
-```javascript
+First, replace the `input` element in `apps/templates/todos.hbs` with an `{{input}}` helper.
+
+```html
+<h1>todos</h1>
 {{input type="text" class="new-todo" placeholder="What needs to be done?" value=newTitle action="createTodo"}}
+//...
 ```
 
-Generate a controller
+The helper binds the `newTitle` property of the controller to the `value` attribute of the input.
+
+Next, use the generator to create a `todos` controller to implement custom logic.
 
 ```sh
 ember g controller todos
 ```
 
-Change `Ember.Controller.extend` to `Ember.ArrayController.extend`.
+In the newly generated `app/controllers/todos.js` change `Ember.Controller.extend` to `Ember.ArrayController.extend` so it will handle the array data that we are passing to it.
 
 Add the following to the extend block
 ```javascript
-tk
+actions: {
+	createTodo: function() {
+		var title = this.get('newTitle');
+		if (!title.trim()) { return; }
+
+		var todo = this.store.createRecord('todo', {
+			title: title,
+			isCompleted: false
+		});
+
+		this.set('newTitle', '');
+
+		todo.save();
+	}
+}
 ```
+
+`createTodo` gets the `newTitle` property and creates a new todo record using the input as the title and setting `isCompleted` to false. It then clears the input and saves the record to the store.
 
 ## Marking a Model as Complete or Incomplete
 
