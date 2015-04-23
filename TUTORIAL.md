@@ -493,31 +493,161 @@ model: function() {
 
 ## Transitioning to show only incomplete todos
 
+Create a new `active` route within the `todos` resource using the generator.
+
 ```sh
 ember g route todos/active
 ```
 
+This route will use the `todos` model with a filter applied. It will also render in the `todos/index` template that was created earlier. Add the following to `app/routes/todos/active.js`.
+
+```javascript
+model: function() {
+  return this.store.filter('todo', function(todo) {
+    return !todo.get('isCompleted');
+  });
+},
+renderTemplate: function(controller) {
+  this.render('todos/index', {controller: controller});
+}
+```
+
+The model function returns todos with the `isCompleted` property equal to false.
+
+Modify `app/templates/todos.hbs` to replace the `Active` link with a `{{link-to}}` helper.
+
+```html
+<li>
+  <a href="all">All</a>
+</li>
+<li>
+  {{#link-to "todos.active" activeClass="selected"}}Active{{/link-to}}
+</li>
+<li>
+  <a href="completed">Completed</a>
+</li>
+```
+
 ## Transitioning to show only completed todos
+
+Create a new `completed` route within the `todos` resource using the generator.
 
 ```sh
 ember g route todos/completed
 ```
+Add the following to `app/routes/todos/completed.js`.
+
+```javascript
+model: function() {
+  return this.store.filter('todo', function(todo) {
+    return todo.get('isCompleted');
+  });
+},
+renderTemplate: function(controller) {
+  this.render('todos/index', {controller: controller});
+}
+```
+
+Modify `app/templates/todos.hbs` to replace the `Completed` link with a `{{link-to}}` helper.
+
+```html
+<li>
+  <a href="all">All</a>
+</li>
+<li>
+  {{#link-to "todos.active" activeClass="selected"}}Active{{/link-to}}
+</li>
+<li>
+  {{#link-to "todos.completed" activeClass="selected"}}Completed{{/link-to}}
+</li>
+```
 
 ## Transitioning back to show all todos
 
-tk
+Modify `app/templates/todos.hbs` to replace the `All` link with a `{{link-to}}` helper.
+
+```html
+<li>
+  {{#link-to "todos.index" activeClass="selected"}}All{{/link-to}}
+</li>
+<li>
+  {{#link-to "todos.active" activeClass="selected"}}Active{{/link-to}}
+</li>
+<li>
+  {{#link-to "todos.completed" activeClass="selected"}}Completed{{/link-to}}
+</li>
+```
 
 ## Displaying a button to remove all completed todos
 
-tk
+TodoMVC allows users to remove all todos that have been marked as completed with a button click. In `app/templates/todos.js` update the static `<button>` element with an `{{action}}`.
+
+```javascript
+{{#if hasCompleted}}
+  <button class="clear-completed" {{action "clearCompleted"}}>
+    Clear completed ({{completed}})
+  </button>
+{{/if}}
+```
+
+`app/controllers/todos.js` needs to be updated to add the `hasCompleted` and `completed` properties as well as the `clearCompleted` method.
+
+```javascript
+actions: {
+  clearCompleted: function() {
+    var completed = this.filterBy('isCompleted', true);
+    completed.invoke('deleteRecord');
+    completed.invoke('save');
+  },
+  //...
+},
+hasCompleted: function() {
+  return this.get('completed') > 0;
+}.property('completed'),
+completed: function() {
+  return this.filterBy('isCompleted', true).get('length');
+}.property('@each.isCompleted'),
+//...
+```
+
+`filterBy` returns an EmberArray object which contains only items that return true. The `invoke` method is part of the EmberArray API and executes a method on each object in the array.
 
 ## Indicating when all todos are complete
 
-tk
+Update the static checkbox in `app/templates/todos.hbs`. This checkbox will indicate when all todos are complete.
+
+```html
+<section class="main">
+  {{outlet}}
+  {{input type="checkbox" class="toggle-all" checked=allAreDone}}
+</section>
+```
+
+This checkbox will be checked when `allAreDone` is `true`. Implement `allAreDone` in `app/controllers/todos.js`.
+
+```javascript
+allAreDone: function(key, value) {
+  return !!this.get('length') && this.isEvery('isCompleted');
+}.property('@each.isCompleted')
+```
 
 ## Toggling all todos between complete and incomplete
 
-tk
+The checkbox that was just implemented is useful, but it would be much more useful if it could toggle all of the todos between complete and incomplete.
+
+To implement this, modify `allAreDone` in `app/controllers/todos.js`.
+
+```javascript
+allAreDone: function(key, value) {
+  if (value === undefined) {
+    return !!this.get('length') && this.isEvery('isCompleted');
+  } else {
+    this.setEach('isCompleted', value);
+    this.invoke('save');
+    return value;
+  }
+}.property('@each.isCompleted')
+```
 
 ## Replacing HTTP-Mock with localStorage
 
