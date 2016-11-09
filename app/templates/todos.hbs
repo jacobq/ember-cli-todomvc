@@ -6,28 +6,12 @@
             class="new-todo"
             placeholder="What needs to be done?"
             value=newTitle
-            action="createTodo"}}
+            enter=(action 'createTodo')
+        }}
     </header>
 
     <section class="main">
-
-        <ul class="todo-list">
-            {{#each todo in model itemController="todo"}}
-                <li {{bind-attr class="todo.model.isCompleted:completed todo.model.isEditing:editing"}}>
-                    {{#if todo.model.isEditing}}
-                        {{edit-todo class="edit"
-                                    value=todo.model.title
-                                    focus-out="acceptChanges"
-                                    insert-newline="acceptChanges"}}
-                    {{else}}
-                        {{input type="checkbox" checked=todo.model.isCompleted class="toggle"}}
-                        <label {{action "editTodo" on="doubleClick"}}>{{todo.model.title}}</label>
-                        <button {{action "removeTodo"}} class="destroy"></button>
-                    {{/if}}
-                </li>
-            {{/each}}
-        </ul>
-
+        {{todo-list items=model}}
         {{input type="checkbox" class="toggle-all" checked=allAreDone}}
     </section>
 
@@ -37,18 +21,18 @@
     </span>
         <ul class="filters">
             <li>
-                {{#link-to "todos.index" activeClass="selected"}}All{{/link-to}}
+                {{#link-to "todos.index" activeClass='selected'}}All{{/link-to}}
             </li>
             <li>
-                {{#link-to "todos.active" activeClass="selected"}}Active{{/link-to}}
+                {{#link-to "todos.active" activeClass='selected'}}Active{{/link-to}}
             </li>
             <li>
-                {{#link-to "todos.completed" activeClass="selected"}}Completed{{/link-to}}
+                {{#link-to "todos.completed" activeClass='selected'}}Completed{{/link-to}}
             </li>
         </ul>
 
         {{#if hasCompleted}}
-            <button class="clear-completed" {{action "clearCompleted"}}>
+            <button class="clear-completed" {{action 'clearCompleted'}}>
                 Clear completed ({{completed}})
             </button>
         {{/if}}

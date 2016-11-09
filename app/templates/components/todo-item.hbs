@@ -1,0 +1,10 @@
+{{#if isEditing}}
+    {{edit-todo class="edit"
+                value=item.title
+                focus-out="acceptChanges"
+                insert-newline="acceptChanges"}}
+{{else}}
+    {{input type="checkbox" checked=item.isCompleted class="toggle"}}
+    <label onDblClick={{action 'editTodo'}}>{{item.title}}</label>
+    <button {{action "removeTodo"}} class="destroy"></button>
+{{/if}}
