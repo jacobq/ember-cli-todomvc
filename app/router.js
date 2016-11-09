@@ -1,15 +1,12 @@
 import Ember from 'ember';
 import config from './config/environment';
 
-var Router = Ember.Router.extend({
-  location: config.locationType
+const Router = Ember.Router.extend({
+  location: config.locationType,
+  rootURL: config.rootURL
 });
 
-export default Router.map(function() {
-  this.resource('todos', {
-    path: '/'
-  }, function() {
-    this.route('active');
-    this.route('completed');
-  });
+Router.map(function() {
 });
+
+export default Router;
