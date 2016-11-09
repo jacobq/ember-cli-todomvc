@@ -9,22 +9,22 @@ export default Ember.Controller.extend({
             this.set('isEditing', false);
 
             if (Ember.isEmpty(this.get('model.title'))) {
-                this.send('removeTodo')
+                this.send('removeTodo');
             } else {
                 this.get('model').save();
             }
         },
         removeTodo: function () {
-            var todo = this.get('model');
+            let todo = this.get('model');
             todo.deleteRecord();
             todo.save();
         }
     },
     isEditing: false,
     isCompleted: function (key, value) {
-        var model = this.get('model');
+        let model = this.get('model');
 
-        if (value == undefined) {
+        if (value === undefined) {
             return model.get('isCompleted');
         } else {
             model.set('isCompleted', value);
