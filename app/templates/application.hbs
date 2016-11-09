@@ -11,7 +11,7 @@
     </header>
 
     <section class="main">
-        {{todo-list items=model}}
+        {{outlet}}
         {{input type="checkbox" class="toggle-all" checked=allAreDone}}
     </section>
 
@@ -21,7 +21,7 @@
     </span>
         <ul class="filters">
             <li>
-                {{#link-to "todos.index" activeClass='selected'}}All{{/link-to}}
+                {{#link-to "todos.all" activeClass='selected'}}All{{/link-to}}
             </li>
             <li>
                 {{#link-to "todos.active" activeClass='selected'}}Active{{/link-to}}
